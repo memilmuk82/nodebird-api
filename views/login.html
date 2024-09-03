@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> <!-- 문서의 문자 인코딩을 UTF-8로 설정 -->
+        <title>API 서버 로그인</title> <!-- 페이지의 제목을 설정 -->
+        <style>
+            .input-group label { 
+                width: 200px; /* 레이블의 너비를 200px로 설정 */
+                display: inline-block; /* 레이블을 인라인 블록 요소로 설정 */
+            }
+        </style>
+    </head>
+    <body>
+        {% if user and user.id %} <!-- 사용자 정보가 있고 사용자 ID가 존재할 경우 -->
+            <span class="user-name">안녕하세요! {{user.nick}}님</span> <!-- 사용자에게 인사말과 닉네임을 표시 -->
+            <a href="/auth/logout">
+                <button>로그아웃</button> <!-- 로그아웃 버튼 -->
+            </a>
+            <fieldset>
+                <legend>도메인 등록</legend> <!-- 도메인 등록 섹션의 제목 -->
+                <form action="/domain" method="post"> <!-- 도메인 등록을 위한 폼, POST 방식으로 서버에 제출 -->
+                    <div>
+                        <label for="type-free">무료</label>
+                        <input type="radio" id="type-free" name="type" value="free"> <!-- 무료 도메인 타입 선택 -->
+                        <label for="type-premium">프리미엄</label>
+                        <input type="radio" id="type-premium" name="type" value="premium"> <!-- 프리미엄 도메인 타입 선택 -->
+                    </div>
+                    <div>
+                        <label for="host">도메인</label>
+                        <input type="text" id="host" name="host" placeholder="ex) jps.sc.kr"> <!-- 도메인 입력 필드, 예시로 'jps.sc.kr' -->
+                    </div>
+                    <button>저장</button> <!-- 도메인 정보를 저장하는 버튼 -->
+                </form>
+            </fieldset>
+            <table>
+                <tr>
+                    <th>도메인 주소</th> <!-- 테이블 헤더: 도메인 주소 -->
+                    <th>타입</th> <!-- 테이블 헤더: 도메인 타입 -->
+                    <th>클라이언트 비밀키</th> <!-- 테이블 헤더: 클라이언트 비밀 키 -->
+                </tr>
+                {% for domain in domains %} <!-- 도메인 목록을 반복하여 테이블에 표시 -->
+                    <tr>
+                        <td>{{domain.host}}</td> <!-- 도메인 주소 표시 -->
+                        <td>{{domain.type}}</td> <!-- 도메인 타입 표시 -->
+                        <td>{{domain.clientSecret}}</td> <!-- 클라이언트 비밀 키 표시 -->
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %} <!-- 사용자 정보가 없을 경우 로그인 폼을 표시 -->
+            <form action="/auth/login" id="login-form" method="post"> <!-- 로그인 폼, POST 방식으로 서버에 제출 -->
+                <h2>NodeBird 계정으로 로그인하세요.</h2> <!-- 로그인 안내 메시지 -->
+                <div class="input-group">
+                    <label for="email">이메일</label>
+                    <input id="email" type="email" name="email" required autofocus> <!-- 이메일 입력 필드, 필수 입력 -->
+                </div>
+                <div class="input-group">
+                    <label for="password">비밀번호</label>
+                    <input id="password" type="password" name="password" required> <!-- 비밀번호 입력 필드, 필수 입력 -->
+                </div>
+                <div>회원가입은 localhost:8001에서 하세요.</div> <!-- 회원가입 안내 메시지 -->
+                <button id="login" type="submit">로그인</button> <!-- 로그인 버튼 -->
+            </form>
+            <script>
+                window.onload = () => {
+                    const url = new URL(location.href); // 현재 페이지 URL 객체를 생성
+                    const error = url.searchParams.get('error'); // URL의 'error' 파라미터 값을 가져옴
+                    if (error) { // 'error' 파라미터가 존재하면
+                        alert(error); // 에러 메시지를 알림창으로 표시
+                    }
+                };
+            </script>
+        {% endif %} <!-- if-else 문 종료 -->
+    </body>
+</html>

@@ -52,6 +52,7 @@ class User extends Sequelize.Model { // User 모델 정의
             as: 'Followings', // 이 관계를 'Followings'로 참조
             through: 'Follow', // 'Follow' 테이블을 통해 다대다 관계를 설정
         });
+        db.User.hasMany(db.Domain); // User 모델은 여러 Domain을 가질 수 있음. (1:N 관계)
     } 
 };
 
