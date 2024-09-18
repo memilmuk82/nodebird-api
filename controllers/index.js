@@ -10,10 +10,10 @@ exports.renderLogin = async (req, res, next) => {
             // 시퀄라이즈 where에는 undefined가 들어가면 안되므로 req.user?.id || null 사용
             include: { model: Domain }, // 사용자의 도메인 정보도 함께 포함
         });
-        // 로그인 페이지를 렌더링, 사용자와 사용자의 도메인을 전달
+        // 로그인 페이지 렌더링, 사용자와 사용자 도메인을 전달
         res.render('login', {
             user,
-            domains: user?.Domains, // 사용자의 도메인이 있을 경우 포함
+            domains: user?.Domains, // 사용자 도메인이 있을 경우 포함
         });
     } catch(err) {
         console.error(err); // 오류 발생 시 콘솔에 오류 출력
