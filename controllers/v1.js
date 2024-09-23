@@ -50,7 +50,7 @@ exports.createToken = async (req, res) => {
 };
 
 // 토큰을 검증하고 그 결과를 반환하는 함수
-// 토큰을 검증하는 미들웨어를 거친 후 검증이 성공했다면 토큰의 내용물을 응답으로 전송
+// 토큰을 검증하는 미들웨어 -> 검증 성공 -> 토큰의 내용물을 응답으로 전송
 exports.tokenTest = (req, res) => {
     res.json(res.locals.decoded); // 미들웨어에서 검증된 토큰의 decoded 정보를 반환
 };
