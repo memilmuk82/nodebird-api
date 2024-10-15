@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken'); // JWT 모듈 불러오기
-const { Domain, User } = require('../models'); // Domain과 User 모델 불러오기
+const { Domain, User, Post, Hashtag } = require('../models'); // Domain, User, Post, Hashtag 모델 불러오기
 
 // 토큰을 생성하는 함수
 // 전달 받은 클라이언트 비밀키로 도메인이 등록될 것인지 확인
@@ -53,4 +53,47 @@ exports.createToken = async (req, res) => {
 // 토큰을 검증하는 미들웨어 -> 검증 성공 -> 토큰의 내용물을 응답으로 전송
 exports.tokenTest = (req, res) => {
     res.json(res.locals.decoded); // 미들웨어에서 검증된 토큰의 decoded 정보를 반환
+};
+
+// 사용자의 게시물을 가져오는 함수
+exports.getMyPosts = (req, res) => {
+    Post.findAll({ where: { userId: res.locals.decoded.id } }) // 현재 사용자 ID를 기준으로 게시물 검색
+        .then((posts) => { // 게시물 검색 성공
+            console.log(posts); // 검색된 게시물 로그 출력
+            res.json({ // 성공 응답
+                code: 200,
+                payload: posts, // 검색된 게시물 반환
+            });
+        })
+        .catch((error) => { // 에러 처리
+            console.error(error); // 에러 로그 출력
+            return res.status(500).json({ // 500 Internal Server Error 응답
+                code: 500,
+                message: '서버 에러', // 서버 에러 메시지 전송
+            });
+        });
+};
+
+// 해시태그에 따른 게시물을 가져오는 함수
+exports.getPostsByHashtag = async (req, res) => {
+    try {
+        const hashtag = await Hashtag.findOne({ where: { title: req.params.title } }); // 해시태그 검색
+        if (!hashtag) { // 해시태그가 존재하지 않는 경우
+            return res.status(404).json({ // 404 Not Found 응답
+                code: 404,
+                message: '검색 결과가 없습니다.', // 검색 결과 없음 메시지 전송
+            });
+        }
+        const posts = await hashtag.getPosts(); // 해시태그에 연결된 게시물 가져오기
+        return res.json({ // 성공 응답
+            code: 200,
+            payload: posts, // 검색된 게시물 반환
+        });
+    } catch (error) { // 에러 처리
+        console.error(error); // 에러 로그 출력
+        return res.status(500).json({ // 500 Internal Server Error 응답
+            code: 500,
+            message: '서버 에러', // 서버 에러 메시지 전송
+        });
+    }
 };
