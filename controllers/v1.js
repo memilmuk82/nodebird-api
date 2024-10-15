@@ -57,7 +57,7 @@ exports.tokenTest = (req, res) => {
 
 // 사용자의 게시물을 가져오는 함수
 exports.getMyPosts = (req, res) => {
-    Post.findAll({ where: { userId: res.locals.decoded.id } }) // 현재 사용자 ID를 기준으로 게시물 검색
+    Post.findAll({ where: { UserId: res.locals.decoded.id } }) // 현재 사용자 ID를 기준으로 게시물 검색
         .then((posts) => { // 게시물 검색 성공
             console.log(posts); // 검색된 게시물 로그 출력
             res.json({ // 성공 응답
