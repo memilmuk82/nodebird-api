@@ -5,7 +5,20 @@ const User = require('./user'); // User 모델 불러오기
 const Post = require('./post'); // Post 모델 불러오기
 const Hashtag = require('./hashtag'); // Hashtag 모델 불러오기
 const env = process.env.NODE_ENV || 'development'; // 현재 환경 설정
-const config = require('../config/config')[env];  // 환경 설정 파일 불러오기
+const fileConfig = require('../config/config')[env] || {};
+const config = {
+  ...fileConfig,
+  database: process.env.DB_NAME || fileConfig.database,
+  username: process.env.DB_USER || fileConfig.username,
+  password: process.env.DB_PASSWORD || fileConfig.password,
+  host: process.env.DB_HOST || fileConfig.host,
+  port: process.env.DB_PORT || fileConfig.port,
+  dialect: process.env.DB_DIALECT || fileConfig.dialect || 'postgres',
+};
+
+if (!config.database || !config.username || !config.host) {
+  throw new Error(`${env} 환경의 PostgreSQL 연결 설정이 필요합니다.`);
+}
 
 const db = {}; // 데이터베이스 객체 생성
 const sequelize = new Sequelize( // 데이터베이스 연결 설정

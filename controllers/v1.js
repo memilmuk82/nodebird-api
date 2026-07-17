@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken'); // JWT 모듈 불러오기
 const { Domain, User, Post, Hashtag } = require('../models'); // Domain, User, Post, Hashtag 모델 불러오기
+const { isAllowedOrigin } = require('../utils/domain');
 
 // 토큰을 생성하는 함수
 // 전달 받은 클라이언트 비밀키로 도메인이 등록될 것인지 확인
@@ -12,7 +13,7 @@ exports.createToken = async (req, res) => {
             where: { clientSecret }, // clientSecret을 기준으로 도메인 검색
             include: {
                 model: User, // 연결된 User 정보도 함께 가져옴
-                attribute: ['nick', 'id'], // User 모델에서 가져올 필드 정의
+                attributes: ['nick', 'id'], // User 모델에서 가져올 필드 정의
             },
         });
         
@@ -20,6 +21,13 @@ exports.createToken = async (req, res) => {
             return res.status(401).json({
                 code: 401,
                 message: '등록되지 않은 도메인입니다. 먼저 도메인을 등록하세요', // 에러 메시지 전송
+            });
+        }
+
+        if (!isAllowedOrigin(domain.host, req.get('origin'))) {
+            return res.status(403).json({
+                code: 403,
+                message: '등록된 도메인에서만 토큰을 발급할 수 있습니다.',
             });
         }
 

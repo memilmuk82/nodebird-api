@@ -42,7 +42,8 @@ app.use(session({
     secret: process.env.COOKIE_SECRET, // 세션 암호화를 위한 비밀키 설정
     cookie: {
         httpOnly: true, // JavaScript를 통해 클라이언트 측에서 쿠키에 접근할 수 없도록 설정
-        secure: false, // HTTPS에서만 쿠키를 전송할지 여부를 설정 -> 개발환경에서는 false로 설정
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
     },
 }));
 app.use(passport.initialize()); // Passport 초기화 수행
